@@ -1,5 +1,7 @@
 //axios import buraya gelecek
 
+import axios from 'axios';
+
 var benimIP;
 
 
@@ -25,16 +27,38 @@ async function ipAdresimiAl(){
 /*
 	ADIM 1: axios kullanarak, aşağıdaki URL'ye GET sorgusu atacağız
     (tag içindeki yere kendi ipnizi yazarak URL'yi oluşturun):
-    https://apis.ergineer.com/ipgeoapi/<ipniz>
+    !manuel oluşturduğum ip urlsi https://apis.ergineer.com/ipgeoapi/159.146.66.198
 	
 	NOT: Bilgisayarın IP adresini öğrenmek için: https://apis.ergineer.com/ipadresim 
 	ADIM 5'e gelene kadar fonksiyonunuzu test etmek için ip nizi URL'ye manuel olarak ekleyebilirsiniz.
 */
+	
 
+	
 /*
 	ADIM 2: Geri döndürülen verileri inceleyin, bu sizin ip bilgileriniz! Bileşen fonksiyonunuzu geliştirmek içindeki bu veri yapısını
 	iyice anlamanız gerekmektedir.
-	
+	//! ip adresimden alınan bilgiler aşağıda.
+{
+  "sorgu":"159.146.66.198",
+  "durum":"OK",
+  "kıta":"Asia",
+  "ülke":"Turkey",
+  "ülkeKodu":"TR",
+  "ülkebayrağı":"https:\/\/apis.ergineer.com\/ulkebayraklari\/TR",
+  "bölge":"34",
+  "bölgeAdı":"Istanbul",
+  "şehir":"Istanbul",
+  "zip":"34375",
+  "enlem":41.047899999999998499333742074668407440185546875,
+  "boylam":28.9772999999999996134647517465054988861083984375,
+  "saatdilimi":"Europe\/Istanbul",
+  "parabirimi":"TRY",
+  "isp":"TurkNet Iletisim Hizmetleri A.S.",
+  "organizasyon":"Gayrettepe POP Dynamic",
+  "as":"AS12735 TurkNet Iletisim Hizmetleri A.S."
+} 
+
 */
 /*
 	ADIM 3: Argümanı sadece 1 nesne kabül eden bir fonksiyon oluşturun.
@@ -53,6 +77,53 @@ async function ipAdresimiAl(){
 	</div>
     </div>
 */
+	function cardMaker(ipData){
+		const cardDiv = document.createElement('div');
+		cardDiv.classList.add('card');
+
+		const bayrakImg= document.createElement('img')
+		bayrakImg.src = ipData['ülkebayrağı'];
+		cardDiv.appendChild(bayrakImg);
+
+		const cardInfo=document.createElement('div');
+		cardInfo.classList.add('card-info')
+		cardDiv.appendChild(cardInfo);
+
+		const ipAdres = document.createElement('h3');
+		ipAdres.classList.add('ip');
+		ipAdres.textContent = ipData['sorgu'];
+		cardInfo.appendChild(ipAdres);
+
+		const ulke = document.createElement('p');
+		ulke.classList.add('ulke');
+		ulke.textContent = `${ipData["ülke"]} (${ipData.ülkeKodu})`
+		cardInfo.appendChild(ulke);
+
+		const konum = document.createElement('p');
+		konum.textContent = `Enlem: ${ipData.enlem} Boylam: ${ipData.boylam}`;
+		cardInfo.appendChild(konum);
+
+		const sehir = document.createElement('p');
+		sehir.textContent = `Şehir: ${ipData["şehir"]}`;
+		cardInfo.appendChild(sehir);
+
+		const saat = document.createElement("p");
+		saat.textContent = `Saat Dilimi: ${ipData["saatdilimi"]}`;
+		cardInfo.appendChild(saat);
+
+		const paraBirimi = document.createElement("p");
+		paraBirimi.textContent = `Para Birimi: ${ipData["parabirimi"]}`;
+		cardInfo.appendChild(paraBirimi);
+
+		const isp = document.createElement("p");
+		isp.textContent =`ISP: ${ipData["isp"]}`;
+		cardInfo.appendChild(isp);
+
+		return cardDiv;
+
+	}
+
+
 
 /*
 	ADIM 4: API'den alınan verileri kullanarak ADIM 3'te verilen yapıda bir kart oluşturun ve 
@@ -66,6 +137,22 @@ async function ipAdresimiAl(){
 	bilgisayarınızın IP adresini atayacaktır. 
 	Örnek dinamik URL kullanımı: var url = "https://apis.ergineer.com/ipgeoapi/"+benimIP; 
 */
+	//!adım 4 ve 5 aşağıdaki kodlardadır.
+	const cardDiv2 = document.querySelector(".cards");
+
+	const getDatas = async function (){
+		await ipAdresimiAl();
+		axios 
+		.get("https://apis.ergineer.com/ipgeoapi/"+benimIP)
+		.then((response)=>{
+			cardDiv2.appendChild(cardMaker(response.data))
+		})
+		.catch((error)=>{
+			alert(`HATA YAPTIN DOSTUM`);
+		});
+	}
+
+	getDatas();
 
 
 
